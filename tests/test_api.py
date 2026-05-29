@@ -2,15 +2,20 @@ import sys
 import os
 import unittest.mock as mock
 
-# Add the serving directory to path relative to project root
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src', 'serving'))
+# Add serving directory to path BEFORE any imports
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src', 'serving'))
 
-with mock.patch.dict('sys.modules', {'boto3': mock.MagicMock()}):
-    with mock.patch('api.load_model'):
-        from api import app, TYPE_ENCODING
+# Mock boto3 before importing api
+mock_boto3 = mock.MagicMock()
+sys.modules['boto3'] = mock_boto3
+
+# Now patch load_model
+with mock.patch('builtins.open', mock.mock_open()):
+    import api
+    api.load_model = mock.MagicMock()
 
 from fastapi.testclient import TestClient
-client = TestClient(app)
+client = TestClient(api.app)
 
 def test_health():
     response = client.get("/health")
@@ -23,6 +28,6 @@ def test_root():
     assert response.json()["message"] == "Fraud Detection API"
 
 def test_type_encoding():
-    assert TYPE_ENCODING["TRANSFER"] == 4
-    assert TYPE_ENCODING["CASH_OUT"] == 1
-    assert TYPE_ENCODING["PAYMENT"] == 3
+    assert api.TYPE_ENCODING["TRANSFER"] == 4
+    assert api.TYPE_ENCODING["CASH_OUT"] == 1
+    assert api.TYPE_ENCODING["PAYMENT"] == 3
