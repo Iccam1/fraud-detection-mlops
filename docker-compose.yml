@@ -49,7 +49,7 @@ services:
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
     ports:
       - "8081:8080"
-    command: standalone
+    command: bash -c "rm -f /opt/airflow/airflow-webserver.pid && airflow standalone"
     networks:
       - fraud_net
     volumes:
