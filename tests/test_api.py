@@ -1,14 +1,15 @@
-from fastapi.testclient import TestClient
 import sys
-sys.path.insert(0, '/home/vielficker/projects/fraud-detection-mlops/src/serving')
-
-# Mock the model loading so tests don't need MinIO
+import os
 import unittest.mock as mock
-with mock.patch('api.load_model'):
-    from api import app, model, TYPE_ENCODING
-    import pickle
-    import numpy as np
 
+# Add the serving directory to path relative to project root
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src', 'serving'))
+
+with mock.patch.dict('sys.modules', {'boto3': mock.MagicMock()}):
+    with mock.patch('api.load_model'):
+        from api import app, TYPE_ENCODING
+
+from fastapi.testclient import TestClient
 client = TestClient(app)
 
 def test_health():
