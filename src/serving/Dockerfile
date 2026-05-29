@@ -2,7 +2,7 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-RUN pip install fastapi uvicorn boto3 xgboost scikit-learn numpy pydantic
+RUN pip install fastapi uvicorn boto3 xgboost scikit-learn numpy pydantic prometheus-client
 
 COPY api.py .
 

@@ -130,6 +130,8 @@ services:
     container_name: prometheus
     ports:
       - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     networks:
       - fraud_net
 
